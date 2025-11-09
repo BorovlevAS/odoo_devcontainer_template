@@ -1,0 +1,11 @@
+# Ignore everything
+**
+
+# Do not ignore requirements files
+!odoo/odoo/requirements.txt
+# If there are extra requirements files in extra_addons, do not ignore them
+!extra_addons/**/extra_requirements.txt
+!docker/
+
+# Do not ignore conf directory
+!conf/

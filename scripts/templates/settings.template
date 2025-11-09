@@ -1,0 +1,35 @@
+{
+  "odooProjectName": "${workspaceFolderBasename}",
+  "hostOdooRoot": "${workspaceFolder}",
+  "[sql]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "python.languageServer": "Pylance",
+  "python.analysis.userFileIndexingLimit": -1,
+  // set your project's directories here
+  "python.analysis.extraPaths": [
+    "/workspace",
+  ],
+  "black-formatter.args": [
+    "--line-length",
+    "88"
+  ],
+  "flake8.args": [
+    "--config=/workspace/conf/.flake8"
+  ],
+  "pylint.args": [
+    "--rcfile=/workspace/conf/.pylintrc",
+    "--load-plugins=pylint_odoo"
+  ],
+  "pylint.ignorePatterns": [
+    "**/**/__manifest__.py"
+  ],
+}

@@ -1,0 +1,47 @@
+{
+  "name": "Existing Docker Compose (Extend)",
+  "dockerComposeFile": ["../docker/docker-compose.yml", "docker-compose.yml"],
+  "service": "odoo",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.isort",
+        "esbenp.prettier-vscode",
+        "ms-python.vscode-pylance",
+        "ms-python.pylint",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "donjayamanne.python-environment-manager",
+        "donjayamanne.git-extension-pack",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "huuums.vscode-fast-folder-structure",
+        "yzhang.markdown-all-in-one",
+        "janisdd.vscode-edit-csv",
+        "mechatroner.rainbow-csv",
+        "redhat.vscode-xml",
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "IBM.output-colorizer",
+        "mrorz.language-gettext",
+        "Huuums.vscode-fast-folder-structure",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "trinhanhngoc.vscode-odoo"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/odoo/venv/bin/python",
+        "prettier.configPath": "/workspace/conf/.prettierrc.yml",
+        "prettier.prettierPath": "/usr/local/lib/node_modules/prettier",
+        "prettier.resolveGlobalModules": true,
+        "prettier.documentSelectors": ["**/*.xml"]
+      }
+    }
+  },
+  "initializeCommand": "bash scripts/initialize_script.sh",
+  "waitFor": "initializeCommand",
+  "postCreateCommand": "scripts/post_create_script.sh"
+}

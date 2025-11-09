@@ -1,0 +1,41 @@
+version: "3.5"
+services:
+  odoo:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    environment:
+      - PGHOST=db
+      - PGUSER=odoo
+      - PGPASSWORD=odoo
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+      - "8072:8072"
+    volumes:
+      - ../:/workspaces
+      - ../conf/odoo-server.conf:/etc/odoo/odoo-server.conf
+    cap_add:
+      - SYS_PTRACE
+  db:
+    image: postgres:14.13
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ../conf/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ../conf/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - odoo-pg-data:/var/lib/postgresql/data
+    command: |
+      postgres
+      -c 'config_file=/etc/postgresql/postgresql.conf'
+      -c 'hba_file=/etc/postgresql/pg_hba.conf'
+      -c 'data_directory=/var/lib/postgresql/data'
+
+volumes:
+  odoo-pg-data:
