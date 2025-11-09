@@ -61,4 +61,4 @@ if [ ! -d "db_backup" ]; then
     mkdir db_backup
 fi
 
-docker pull borovlevas/odoo-base:17.0
+docker pull borovlevas/odoo-base:14.0
