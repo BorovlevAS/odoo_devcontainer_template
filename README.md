@@ -6,7 +6,7 @@ This repository provides a ready-to-use development environment template for Odo
 
 **Key Features:**
 - Odoo 14.0 as a Git submodule
-- PostgreSQL 14.13 database
+- PostgreSQL 12.18 database
 - Pre-configured Docker environment
 - VS Code DevContainer support with essential extensions
 - Automated initialization and setup scripts
