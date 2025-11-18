@@ -15,7 +15,7 @@ services:
       - "8069:8069"
       - "8072:8072"
     volumes:
-      - ../:/workspaces
+      - ../:/workspace
       - ../conf/odoo-server.conf:/etc/odoo/odoo-server.conf
     cap_add:
       - SYS_PTRACE
