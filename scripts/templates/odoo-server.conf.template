@@ -1,5 +1,5 @@
 [options]
-addons_path = /workspace/odoo,
+addons_path = /workspace/odoo/odoo,
   /workspace/odoo/addons
 admin_passwd = admin
 data_dir = /workspace/varlib
