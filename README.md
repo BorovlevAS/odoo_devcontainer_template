@@ -2,10 +2,10 @@
 
 ## Purpose
 
-This repository provides a ready-to-use development environment template for Odoo 17.0 using VS Code DevContainers. It enables developers to quickly set up a fully configured Odoo development environment with all necessary dependencies, tools, and configurations pre-installed.
+This repository provides a ready-to-use development environment template for Odoo 18.0 using VS Code DevContainers. It enables developers to quickly set up a fully configured Odoo development environment with all necessary dependencies, tools, and configurations pre-installed.
 
 **Key Features:**
-- Odoo 17.0 as a Git submodule
+- Odoo 18.0 as a Git submodule
 - PostgreSQL 14.13 database
 - Pre-configured Docker environment
 - VS Code DevContainer support with essential extensions
@@ -148,4 +148,4 @@ This template is designed to be extended. You can:
 
 ---
 
-**Note:** This template uses Odoo 17.0. Make sure your custom addons are compatible with this version.
+**Note:** This template uses Odoo 18.0. Make sure your custom addons are compatible with this version.
