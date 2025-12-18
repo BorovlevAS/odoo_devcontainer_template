@@ -61,4 +61,16 @@ if [ ! -d "db_backup" ]; then
     mkdir db_backup
 fi
 
+if [ ! -f .odoo-version ]; then
+  echo ".odoo-version file not found"
+  exit 1
+fi
+
+ODOO_VERSION=$(cat .odoo-version)
+
+if [ ! -d odoo/.git ]; then
+  echo "Using Odoo version: ${ODOO_VERSION}"
+  git clone -b ${ODOO_VERSION} --depth=1 https://github.com/odoo/odoo.git odoo
+fi
+
 docker pull borovlevas/odoo-base:14.0

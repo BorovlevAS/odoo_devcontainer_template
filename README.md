@@ -1,26 +1,25 @@
 # Odoo DevContainer Template
 
-## Purpose
+## Description
 
-This repository provides a ready-to-use development environment template for Odoo 14.0 using VS Code DevContainers. It enables developers to quickly set up a fully configured Odoo development environment with all necessary dependencies, tools, and configurations pre-installed.
+A ready-to-use development environment template for Odoo 14.0 using VS Code DevContainers. Includes all necessary tools, configurations, and dependencies for Odoo development.
 
 **Key Features:**
-- Odoo 14.0 as a Git submodule
-- PostgreSQL 12.18 database
-- Pre-configured Docker environment
-- VS Code DevContainer support with essential extensions
+- Odoo 14.0 (automatically cloned during initialization)
+- PostgreSQL 12.18
+- Base Docker image `borovlevas/odoo-base:14.0`
+- VS Code DevContainer with pre-configured extensions
 - Automated initialization and setup scripts
 - Development tools (debugger, linters, formatters)
+- click-odoo utilities for database management
 
-## Usage
+## Prerequisites
 
-### Prerequisites
+- Docker and Docker Compose
+- Visual Studio Code with "Dev Containers" extension
+- Git
 
-- Docker and Docker Compose installed
-- Visual Studio Code with the Remote - Containers extension
-- Git configured with SSH access to GitHub (for Odoo submodule)
-
-### Getting Started
+## Quick Start
 
 1. **Clone the repository:**
    ```bash
@@ -28,124 +27,347 @@ This repository provides a ready-to-use development environment template for Odo
    cd odoo_devcontainer_template
    ```
 
-2. **Initialize the Odoo submodule:**
-   ```bash
-   git submodule update --init --recursive
-   ```
-
-3. **Open in VS Code:**
+2. **Open in VS Code:**
    ```bash
    code .
    ```
 
-4. **Open in DevContainer:**
+3. **Open in DevContainer:**
    - Press `F1` or `Ctrl+Shift+P`
    - Select "Dev Containers: Reopen in Container"
    - Wait for the container to build and initialize
 
-5. **Start Odoo:**
-   - Open a terminal in VS Code
-   - Run:
-     ```bash
-     odoo-bin -c /etc/odoo/odoo-server.conf
-     ```
-   - Access Odoo at `http://localhost:8069`
+   **What happens on first launch:**
+   - Creates `.env` file with project name (from directory name)
+   - Clones Odoo 14.0 repository into `odoo/` folder
+   - Creates necessary directories (`.vscode-server`, `temp`, `db_backup`, `scripts_local`)
+   - Copies VS Code configuration templates (if they don't exist)
+   - Installs `click-odoo-contrib` and `checklog-odoo` packages
+   - Pulls base Docker image
 
-### Project Structure
+4. **Start Odoo:**
+   ```bash
+   cd /workspace
+   python3 odoo/odoo-bin -c conf/odoo-server.conf
+   ```
+   
+   Or use VS Code debugger (see "Debugging" section)
+
+5. **Access Odoo:**
+   - Open in browser: `http://localhost:8069`
+
+## Project Structure
 
 ```
 .
-├── .devcontainer/          # DevContainer configuration
-├── conf/                   # Odoo and PostgreSQL configurations
-│   ├── odoo-server.conf   # Main Odoo configuration file
-│   └── postgres/          # PostgreSQL settings
-├── docker/                 # Docker setup files
-│   ├── Dockerfile         # Odoo container image
-│   └── docker-compose.yml # Services orchestration
-├── odoo/                   # Odoo source code (Git submodule)
-├── scripts/                # Initialization and setup scripts
-│   ├── initialize_script.sh
-│   ├── post_create_script.sh
-│   └── templates/         # VS Code configuration templates
-├── .local/                 # Odoo data directory
-├── db_backup/             # Database backups location
-└── temp/                  # Temporary files
+├── .devcontainer/             # DevContainer configuration
+│   ├── devcontainer.json     # Main configuration
+│   └── docker-compose.yml    # Additional container parameters
+├── conf/                      # Odoo and PostgreSQL configuration
+│   ├── odoo-server.conf      # Main Odoo configuration
+│   └── postgres/             # PostgreSQL settings
+│       ├── postgresql.conf
+│       └── pg_hba.conf
+├── docker/                    # Docker files
+│   ├── Dockerfile            # Odoo container image (based on borovlevas/odoo-base:18.0)
+│   └── docker-compose.yml    # Services orchestration (odoo + db)
+├── odoo/                      # Odoo 18.0 source code (cloned automatically)
+├── scripts/                   # Initialization scripts
+│   ├── initialize_script.sh  # Runs before container creation
+│   ├── post_create_script.sh # Runs after container creation
+│   ├── templates/            # VS Code configuration templates
+│   │   ├── launch.template
+│   │   ├── settings.template
+│   │   ├── tasks.template
+│   │   └── odoo-server.conf.template
+│   └── template_scripts/     # Local script templates
+│       ├── run_tests.sh
+│       ├── update_db.sh
+│       └── update_repo_and_db.sh
+├── scripts_local/             # Local scripts (created automatically)
+├── varlib/                    # Odoo data (filestore, sessions)
+├── db_backup/                 # Database backups
+├── temp/                      # Temporary files
+├── .env                       # Environment variables (created automatically)
+├── .odoo-version              # Odoo version (18.0)
+└── .vscode/                   # VS Code settings (created automatically)
+    ├── launch.json
+    ├── settings.json
+    └── tasks.json
 ```
 
-### Configuration
+## Configuration
 
-#### Odoo Configuration
-Edit `conf/odoo-server.conf` to customize:
-- Database connection settings
-- Addons paths
-- Server parameters
-- Performance limits
+### Odoo
 
-#### Database Access
-- **Host:** `db` (within container) or `localhost` (from host)
+Main configuration file: `conf/odoo-server.conf`
+
+**Important parameters:**
+- `addons_path`: `/workspace/odoo,/workspace/odoo/addons` (you can add custom paths)
+- `data_dir`: `/workspace/varlib` (file storage)
+- `db_host`: `db` (PostgreSQL service name)
+- `admin_passwd`: Hashed master password
+- `workers`: `0` (for development mode)
+- `gevent_port`: `8072` (longpolling)
+
+### Database
+
+**Connection parameters:**
+- **Host:** `db` (inside container) / `localhost` (from host)
 - **Port:** `5432`
 - **User:** `odoo`
 - **Password:** `odoo`
-- **Database:** `postgres`
+- **Database:** `postgres` (default)
 
-#### Ports
+### Ports
+
 - **8069:** Odoo web interface
-- **8072:** Odoo longpolling
+- **8072:** Longpolling (for chat and notifications)
 
-### Development Workflow
+### Environment Variables
 
-#### Installing Additional Python Packages
-Uncomment and edit in `docker/Dockerfile`:
-```dockerfile
-COPY extra_addons/extra_requirements.txt /tmp/extra_requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/extra_requirements.txt
-```
-
-#### Adding Custom Addons
-Add your custom addon paths to `conf/odoo-server.conf`:
-```ini
-addons_path = /workspace/odoo,
-    /workspace/odoo/addons,
-    /workspace/extra_addons
-```
-
-#### Debugging
-The DevContainer comes with pre-configured launch configurations in `.vscode/launch.json` for debugging Odoo.
-
-#### Database Management
-Local scripts are available in `scripts_local/` for common database operations (created during initialization).
-
-### VS Code Extensions
-
-The DevContainer includes pre-installed extensions:
-- **Python:** Black, Flake8, isort, Pylint, Pylance
-- **Odoo:** Odoo development support
-- **Git:** Git Graph, Git History
-- **Database:** SQLTools with PostgreSQL driver
-- **Utilities:** CSV editor, XML support, Markdown tools
-
-### Troubleshooting
-
-**Container fails to start:**
-- Ensure Docker is running
-- Check if ports 8069 and 8072 are available
-
-**Odoo submodule is empty:**
+The `.env` file is created automatically during initialization:
 ```bash
-git submodule update --init --recursive
+COMPOSE_PROJECT_NAME=<directory_name>
 ```
 
-**Permission issues:**
-The initialization script handles common permission setup automatically.
+## Development Workflow
 
-### Customization
+### Installing Additional Python Packages
 
-This template is designed to be extended. You can:
-- Modify the base image in `docker/Dockerfile`
-- Add environment-specific configurations
-- Customize initialization scripts in `scripts/`
-- Add project-specific VS Code settings
+1. Create a requirements file (e.g., `extra_addons/extra_requirements.txt`)
+2. Uncomment and edit in `docker/Dockerfile`:
+   ```dockerfile
+   COPY extra_addons/extra_requirements.txt /tmp/extra_requirements.txt
+   RUN pip3 install --no-cache-dir -r /tmp/extra_requirements.txt
+   ```
+3. Rebuild container: `Dev Containers: Rebuild Container`
+
+### Adding Custom Addons
+
+1. Create a directory for addons (e.g., `extra_addons/`)
+2. Add path to `conf/odoo-server.conf`:
+   ```ini
+   addons_path = /workspace/odoo,
+       /workspace/odoo/addons,
+       /workspace/extra_addons
+   ```
+
+### Debugging
+
+DevContainer includes pre-configured debug configuration in `.vscode/launch.json`:
+
+**"Python: Debug Odoo" configuration:**
+- Launches `odoo-bin` with configuration from `conf/odoo-server.conf`
+- Enables `--dev=xml` mode (automatic view reloading)
+- Uses integrated terminal
+
+**How to use:**
+1. Set breakpoints in your code
+2. Press `F5` or select "Run" → "Start Debugging"
+3. Odoo will start in debug mode
+
+### Database Management
+
+After initialization, utilities are available in `scripts_local/`:
+
+**`update_db.sh`** - Update database:
+```bash
+./scripts_local/update_db.sh
+```
+Uses `click-odoo-update` to update modules in `devdb` database.
+
+**`run_tests.sh`** - Run tests:
+```bash
+./scripts_local/run_tests.sh yes tests_db
+```
+Parameters:
+- `yes`/`no` - whether to drop database before tests
+- Database name for testing
+
+**`update_repo_and_db.sh`** - Update repository and database:
+```bash
+./scripts_local/update_repo_and_db.sh
+```
+Updates all submodules and runs database update.
+
+### click-odoo Utilities
+
+Installed utilities:
+- `click-odoo-update` - update modules
+- `click-odoo-dropdb` - drop database
+- `click-odoo-backupdb` - backup database
+- `click-odoo-restoredb` - restore from backup
+- `checklog-odoo` - analyze Odoo logs
+
+## VS Code Extensions
+
+DevContainer includes the following extensions:
+
+**Python:**
+- `ms-python.python` - Python support
+- `ms-python.vscode-pylance` - Advanced language server
+- `ms-python.debugpy` - Debugger
+- `ms-python.black-formatter` - Code formatting
+- `ms-python.flake8` - Linter
+- `ms-python.isort` - Import sorting
+- `ms-python.pylint` - Linter
+- `donjayamanne.python-environment-manager` - Environment management
+
+**Odoo:**
+- `trinhanhngoc.vscode-odoo` - Odoo development support
+
+**Git:**
+- `donjayamanne.git-extension-pack` - Git extensions pack
+- `mhutchie.git-graph` - Git history visualization
+- `donjayamanne.githistory` - File history
+
+**Database:**
+- `mtxr.sqltools` - SQL client
+- `mtxr.sqltools-driver-pg` - PostgreSQL driver
+
+**Utilities:**
+- `janisdd.vscode-edit-csv` - CSV editor
+- `mechatroner.rainbow-csv` - CSV highlighting
+- `redhat.vscode-xml` - XML support
+- `formulahendry.auto-close-tag` - Auto close tags
+- `formulahendry.auto-rename-tag` - Auto rename tags
+- `yzhang.markdown-all-in-one` - Markdown tools
+- `IBM.output-colorizer` - Output highlighting
+- `mrorz.language-gettext` - gettext support
+- `esbenp.prettier-vscode` - Formatting (XML)
+- `huuums.vscode-fast-folder-structure` - Fast folder structure creation
+
+**Python Settings:**
+- Default interpreter: `/opt/odoo/venv/bin/python`
+- Prettier for XML file formatting
+
+## Troubleshooting
+
+### Container Fails to Start
+
+1. Ensure Docker is running
+2. Check if ports 8069 and 8072 are available:
+   ```bash
+   sudo lsof -i :8069
+   sudo lsof -i :8072
+   ```
+3. Check container logs:
+   ```bash
+   docker-compose -f docker/docker-compose.yml logs
+   ```
+
+### Empty odoo/ Directory
+
+The Odoo repository is cloned automatically during first initialization. If cloning didn't happen:
+
+```bash
+# Remove directory
+rm -rf odoo
+
+# Rebuild container
+# VS Code: Dev Containers: Rebuild Container
+```
+
+Or clone manually:
+```bash
+git clone -b 14.0 --depth=1 https://github.com/odoo/odoo.git odoo
+```
+
+### Package Installation Errors
+
+If `click-odoo-contrib` or other packages failed to install:
+
+```bash
+cd /workspace/odoo
+pip install -e . click-odoo-contrib checklog-odoo
+```
+
+### Permission Issues
+
+The initialization script automatically configures necessary directories. If issues occur:
+
+```bash
+git config --global --add safe.directory '*'
+```
+
+### Ports Already in Use
+
+Change ports in `docker/docker-compose.yml`:
+```yaml
+ports:
+  - "8069:8069"  # Change first number, e.g.: "8070:8069"
+  - "8072:8072"  # Change first number, e.g.: "8073:8072"
+```
+
+## Project Customization
+
+The template is easily adaptable for specific projects:
+
+### Changing Odoo Version
+
+1. Edit `.odoo-version` file:
+   ```bash
+   echo "18.0" > .odoo-version
+   ```
+
+2. Update base image in `docker/Dockerfile`:
+   ```dockerfile
+   FROM borovlevas/odoo-base:18.0
+   ```
+
+3. Rebuild container
+
+### Adding Custom Modules
+
+1. Create modules directory:
+   ```bash
+   mkdir -p client_addons/my_module
+   ```
+
+2. Update `conf/odoo-server.conf`:
+   ```ini
+   addons_path = /workspace/odoo,
+       /workspace/odoo/addons,
+       /workspace/client_addons
+   ```
+
+### Configuring Git Submodules
+
+If you need to work with submodules (e.g., OCA modules):
+
+1. Add submodule:
+   ```bash
+   git submodule add -b 14.0 https://github.com/OCA/web.git external_addons/web
+   ```
+
+2. Update `.gitmodules` with branch specification:
+   ```ini
+   [submodule "external_addons/web"]
+       path = external_addons/web
+       url = https://github.com/OCA/web.git
+       branch = 14.0
+   ```
+
+3. Add path to Odoo configuration
+
+### Customizing Initialization Scripts
+
+Edit:
+- `scripts/initialize_script.sh` - runs before container creation
+- `scripts/post_create_script.sh` - runs after container creation
 
 ---
 
-**Note:** This template uses Odoo 14.0. Make sure your custom addons are compatible with this version.
+## Additional Information
+
+**Base Image:** `borovlevas/odoo-base:14.0`
+- Includes all Odoo 14.0 dependencies
+- Python 3.8
+- wkhtmltopdf for PDF generation
+- Node.js and npm for frontend tools
+
+**Odoo Version:** 14.0  
+**PostgreSQL Version:** 12.18
+
+Ensure your custom modules are compatible with Odoo 14.0.
