@@ -8,8 +8,8 @@ semi: true
 trailingComma: "es5"
 xmlWhitespaceSensitivity: "ignore"
 plugins:
-    - "/usr/local/lib/node_modules/@prettier/plugin-xml/src/plugin.js"
-    - "/usr/local/lib/node_modules/prettier-plugin-sql/lib/index.cjs"
+    - "@prettier/plugin-xml"
+    - "prettier-plugin-sql"
 overrides:
     - files: "*.xml"
       options:
