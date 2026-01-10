@@ -35,7 +35,6 @@
       "settings": {
         "python.defaultInterpreterPath": "/opt/odoo/venv/bin/python",
         "prettier.configPath": "/workspace/conf/.prettierrc.yml",
-        "prettier.prettierPath": "/usr/local/lib/node_modules/prettier",
         "prettier.resolveGlobalModules": true,
         "prettier.documentSelectors": ["**/*.xml"]
       }
