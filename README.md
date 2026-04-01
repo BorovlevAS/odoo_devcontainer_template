@@ -2,12 +2,12 @@
 
 ## Description
 
-A ready-to-use development environment template for Odoo 18.0 using VS Code DevContainers. Includes all necessary tools, configurations, and dependencies for Odoo development.
+A ready-to-use development environment template for Odoo 16.0 using VS Code DevContainers. Includes all necessary tools, configurations, and dependencies for Odoo development.
 
 **Key Features:**
-- Odoo 18.0 (automatically cloned during initialization)
-- PostgreSQL 14.13
-- Base Docker image `borovlevas/odoo-base:18.0`
+- Odoo 16.0 (automatically cloned during initialization)
+- PostgreSQL 15.17
+- Base Docker image `borovlevas/odoo-base:16.0`
 - VS Code DevContainer with pre-configured extensions
 - Automated initialization and setup scripts
 - Development tools (debugger, linters, formatters)
@@ -39,7 +39,7 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 
    **What happens on first launch:**
    - Creates `.env` file with project name (from directory name)
-   - Clones Odoo 18.0 repository into `odoo/` folder
+   - Clones Odoo 16.0 repository into `odoo/` folder
    - Creates necessary directories (`.vscode-server`, `temp`, `db_backup`, `scripts_local`)
    - Copies VS Code configuration templates (if they don't exist)
    - Installs `click-odoo-contrib` and `checklog-odoo` packages
@@ -69,9 +69,9 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 │       ├── postgresql.conf
 │       └── pg_hba.conf
 ├── docker/                    # Docker files
-│   ├── Dockerfile            # Odoo container image (based on borovlevas/odoo-base:18.0)
+│   ├── Dockerfile            # Odoo container image (based on borovlevas/odoo-base:16.0)
 │   └── docker-compose.yml    # Services orchestration (odoo + db)
-├── odoo/                      # Odoo 18.0 source code (cloned automatically)
+├── odoo/                      # Odoo 16.0 source code (cloned automatically)
 ├── scripts/                   # Initialization scripts
 │   ├── initialize_script.sh  # Runs before container creation
 │   ├── post_create_script.sh # Runs after container creation
@@ -82,6 +82,7 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 │   │   └── odoo-server.conf.template
 │   └── template_scripts/     # Local script templates
 │       ├── run_tests.sh
+│       ├── run_quick_test.sh
 │       ├── update_db.sh
 │       └── update_repo_and_db.sh
 ├── scripts_local/             # Local scripts (created automatically)
@@ -118,6 +119,7 @@ Main configuration file: `conf/odoo-server.conf`
 - **User:** `odoo`
 - **Password:** `odoo`
 - **Database:** `postgres` (default)
+- **PostgreSQL version:** `15.17`
 
 ### Ports
 
@@ -184,6 +186,17 @@ Uses `click-odoo-update` to update modules in `devdb` database.
 Parameters:
 - `yes`/`no` - whether to drop database before tests
 - Database name for testing
+
+**`run_quick_test.sh`** - Quick test runner (no DB drop/recreate, uses `--update`):
+```bash
+./scripts_local/run_quick_test.sh --db <db_name> --modules <mod1,mod2> [--py <tags>] [--js <tags>] [--mode py|js|all]
+```
+Parameters:
+- `--db` - database name (created automatically if missing)
+- `--modules` - comma-separated Odoo modules to load
+- `--py` - `--test-tags` for Python tests; omit to run all, pass `-` to skip
+- `--js` - `--test-tags` for JS tests (HttpCase); omit to run all, pass `-` to skip
+- `--mode` - what to run: `py`, `js`, or `all` (default: `all`)
 
 **`update_repo_and_db.sh`** - Update repository and database:
 ```bash
@@ -271,7 +284,7 @@ rm -rf odoo
 
 Or clone manually:
 ```bash
-git clone -b 18.0 --depth=1 https://github.com/odoo/odoo.git odoo
+git clone -b 16.0 --depth=1 https://github.com/odoo/odoo.git odoo
 ```
 
 ### Package Installation Errors

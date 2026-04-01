@@ -20,7 +20,7 @@ services:
     cap_add:
       - SYS_PTRACE
   db:
-    image: postgres:14.13
+    image: postgres:15.17
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=odoo
