@@ -73,4 +73,4 @@ if [ ! -d odoo/.git ]; then
   git clone -b ${ODOO_VERSION} --depth=1 https://github.com/odoo/odoo.git odoo
 fi
 
-docker pull borovlevas/odoo-base:18.0
+docker pull borovlevas/odoo-base:16.0
