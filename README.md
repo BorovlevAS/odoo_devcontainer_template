@@ -2,12 +2,12 @@
 
 ## Description
 
-A ready-to-use development environment template for Odoo 18.0 using VS Code DevContainers. Includes all necessary tools, configurations, and dependencies for Odoo development.
+A ready-to-use development environment template for Odoo 19.0 using VS Code DevContainers. Includes all necessary tools, configurations, and dependencies for Odoo development.
 
 **Key Features:**
-- Odoo 18.0 (automatically cloned during initialization)
-- PostgreSQL 14.13
-- Base Docker image `borovlevas/odoo-base:18.0`
+- Odoo 19.0 (automatically cloned during initialization)
+- PostgreSQL 17
+- Base Docker image `borovlevas/odoo-base:19.0`
 - VS Code DevContainer with pre-configured extensions
 - Automated initialization and setup scripts
 - Development tools (debugger, linters, formatters)
@@ -39,8 +39,8 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 
    **What happens on first launch:**
    - Creates `.env` file with project name (from directory name)
-   - Clones Odoo 18.0 repository into `odoo/` folder
-   - Creates necessary directories (`.vscode-server`, `temp`, `db_backup`, `scripts_local`)
+   - Clones Odoo 19.0 repository into `odoo/` folder
+   - Creates necessary directories (`.vscode-server`, `.vscode-server-insiders`, `temp`, `db_backup`, `scripts_local`)
    - Copies VS Code configuration templates (if they don't exist)
    - Installs `click-odoo-contrib` and `checklog-odoo` packages
    - Pulls base Docker image
@@ -81,6 +81,7 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 │   │   ├── tasks.template
 │   │   └── odoo-server.conf.template
 │   └── template_scripts/     # Local script templates
+│       ├── run_quick_test.sh
 │       ├── run_tests.sh
 │       ├── update_db.sh
 │       └── update_repo_and_db.sh
@@ -103,7 +104,7 @@ A ready-to-use development environment template for Odoo 18.0 using VS Code DevC
 Main configuration file: `conf/odoo-server.conf`
 
 **Important parameters:**
-- `addons_path`: `/workspace/odoo,/workspace/odoo/addons` (you can add custom paths)
+- `addons_path`: `/workspace/odoo/odoo,/workspace/odoo/addons` (you can add custom paths)
 - `data_dir`: `/workspace/varlib` (file storage)
 - `db_host`: `db` (PostgreSQL service name)
 - `admin_passwd`: Hashed master password
@@ -148,7 +149,7 @@ COMPOSE_PROJECT_NAME=<directory_name>
 1. Create a directory for addons (e.g., `extra_addons/`)
 2. Add path to `conf/odoo-server.conf`:
    ```ini
-   addons_path = /workspace/odoo,
+   addons_path = /workspace/odoo/odoo,
        /workspace/odoo/addons,
        /workspace/extra_addons
    ```
@@ -177,13 +178,28 @@ After initialization, utilities are available in `scripts_local/`:
 ```
 Uses `click-odoo-update` to update modules in `devdb` database.
 
-**`run_tests.sh`** - Run tests:
+**`run_tests.sh`** - Run tests (with DB drop/recreate):
 ```bash
 ./scripts_local/run_tests.sh yes tests_db
 ```
 Parameters:
 - `yes`/`no` - whether to drop database before tests
 - Database name for testing
+
+**`run_quick_test.sh`** - Quick test runner (no DB drop, uses `--update`):
+```bash
+./scripts_local/run_quick_test.sh --db tests --modules my_module
+./scripts_local/run_quick_test.sh --db tests --modules my_module --mode py
+./scripts_local/run_quick_test.sh --db tests --modules my_module --mode js
+```
+Required parameters:
+- `--db <name>` - database name
+- `--modules <mod1,mod2>` - comma-separated Odoo modules
+
+Optional parameters:
+- `--py <tags>` - `--test-tags` value for Python tests (omit to run all; `-` to skip)
+- `--js <tags>` - `--test-tags` value for JS/HttpCase tests (omit to run all; `-` to skip)
+- `--mode py|js|all` - what to run (default: `all`)
 
 **`update_repo_and_db.sh`** - Update repository and database:
 ```bash
@@ -271,7 +287,7 @@ rm -rf odoo
 
 Or clone manually:
 ```bash
-git clone -b 18.0 --depth=1 https://github.com/odoo/odoo.git odoo
+git clone -b 19.0 --depth=1 https://github.com/odoo/odoo.git odoo
 ```
 
 ### Package Installation Errors
